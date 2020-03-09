@@ -74,4 +74,3 @@ def dpll(C, N, choix = choix_defaut, base = base_defaut, verbose = False):
                 fin = True
 
     return [x*v for x, v, _ in S]
-

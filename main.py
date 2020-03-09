@@ -28,7 +28,5 @@ def main():
 
         print("Solution : ", s)
 
-
-
 if __name__ == '__main__':
     main()
