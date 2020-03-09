@@ -7,7 +7,6 @@ from dpll import dpll
 MAIN = os.path.abspath(os.path.dirname(__file__))
 DATA = join(MAIN, "data")
 
-
 def main():
     if len(sys.argv) < 1 + 1 or len(sys.argv) > 1 + 2:
         print("usage:", sys.argv[0],"<filename(str)> [optionnal : <verbose(bool)>]")
