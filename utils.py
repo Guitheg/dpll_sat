@@ -1,6 +1,17 @@
 import numpy as np
 
-def get_C(path):
+class Talk:
+    def __init__(self, talkative):
+        self.talkative = talkative
+
+    def __call__(self, say, *args, **kwargs):
+        if self.talkative == True:
+            try:
+                print(say.format(*args, **kwargs))
+            except:
+                print("echec de l'affichage")
+
+def cnf_parser(path):
     """
     CNF file parser
     """
@@ -29,71 +40,3 @@ def get_C(path):
                     except:
                         raise Exception("line["+str(i)+"] clause - parameter problem : "+str(line.split()))
     return data, nb_lit, nb_clause
-
-def _consistant(s, clauses):
-    ret = True
-    clause = True
-    print("test consistant")
-    for c in clauses:
-        print("c:",c, "clause:", clause)
-        nblit = len(c)
-        for l in s:
-            print("l:",l, "nblit:",nblit)
-            if -l in c:
-                nblit -= 1
-                if nblit == 0:
-                    clause = False
-            if clause == False:
-                break
-        ret = clause
-        if clause == False:
-            break      
-    return ret
-
-def no_heuristique(x):
-    return x.pop()
-
-def unitaire(x):
-    pass
-
-def resolve(clauses, nbvar, choisir):
-    run = True
-    s = []
-    x = list(range(1, nbvar+1))
-
-    print("unitaire")
-    for c in clauses:
-        if len(c) == 1:
-            it = abs(c[0])-1
-            x.pop(it)
-            s.append(c[0])
-
-    while run:
-        print("#")
-        print("x", x)
-        print("s", s)
-        if _consistant(s, clauses):
-            print(" - consistant")
-            if len(s) == nbvar:
-                print("|s|=n")
-                run = False
-            else:
-                if len(x) > 0:
-                    s.append(choisir(x))
-                    print("new s", s)
-        else:
-            print(" + nope")
-            while len(s) > 0 and s[len(s)-1] < 0:
-                print("del s[-1] : ", s[-1])
-                x.append(-s[-1])
-                del s[-1]
-            if len(s) > 0:
-                print("|s| (", len(s),") > 0")
-                print("s[len(s)-1]", s[len(s) - 1], "~>", -s[len(s) - 1])
-                s[len(s) - 1] = -s[len(s) - 1]
-            else:
-                print("fin")
-                run = False
-        print("")
-
-    return np.asarray(s)

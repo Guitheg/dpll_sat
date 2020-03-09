@@ -1,17 +1,22 @@
-import utils as u
+import os
 from os.path import join
 
-DATA = "data"
+import utils as u
+from dpll import dpll
+
+MAIN = os.path.abspath(os.path.dirname(__file__))
+DATA = join(MAIN, "data")
 SAT_A = join(DATA, "uf20-01.cnf")
 TEST = join(DATA, "test.cnf")
 
 def main():
-    data, nb_lit, nb_clause = u.get_C(TEST)
+
+    data, nb_lit, nb_clause = u.cnf_parser(TEST)
     print(data)
-    s = u.resolve(data, nb_lit, u.no_heuristique)
+    s = dpll(data, nb_lit, verbose=False)
     print(s)
 
-    # print()
+
 
 if __name__ == '__main__':
     main()
