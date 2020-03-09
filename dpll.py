@@ -1,6 +1,4 @@
-import numpy as np
 from utils import Talk
-
 
 def affectation(l, S):
     for (X, v, _) in S:

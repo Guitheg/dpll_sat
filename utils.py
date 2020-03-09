@@ -1,11 +1,17 @@
-import numpy as np
+import os
+
+def get_file_ext(file):
+    return file.split(".")[-1]
+
+def get_env(path):
+    return [file for file in os.listdir(path) if get_file_ext(file) == "cnf"]
 
 class Talk:
     def __init__(self, talkative):
         self.talkative = talkative
 
     def __call__(self, say, *args, **kwargs):
-        if self.talkative == True:
+        if self.talkative:
             try:
                 print(say.format(*args, **kwargs))
             except:
