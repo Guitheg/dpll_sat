@@ -1,6 +1,7 @@
-from utils import Talk
+from tlbpy import Talk
+import numpy as np
 
-def affectation(l, S):
+def affectation_xvw(l, S):
     for (X, v, _) in S:
         if l == X and v == -1:
             return True
@@ -8,7 +9,7 @@ def affectation(l, S):
             return True
     return False
 
-def consistance(S, C):
+def consistance(S, C, affectation = affectation_xvw):
     """
     S : pile des affectations courantes
     C : ensemble des clauses
@@ -34,10 +35,80 @@ def base_defaut(N):
         B.append((i+1, +1, -1))
     return B
 
-def choix_defaut(B, i):
-    return B[i]
+def choix_defaut(B, S, C, N):
+    return B[len(S)]
 
-def dpll(C, N, choix = choix_defaut, base = base_defaut, verbose = False):
+def neg(X):
+    (x, v, w) = X
+    return (x, w, v)
+
+def unique(X):
+    (x, v, _) = X
+    return (x, v, None)
+
+def build_pure(C):
+    P = []
+    notPure = []
+    for c in C:
+        for l in c:
+            if l not in P and l not in notPure:
+                br = False
+                for k in C:
+                    for m in k:
+                        if l + m == 0:
+                            notPure.append(l)
+                            br = True
+                            break
+                    if br : break
+                if not br:
+                    P.append(l)
+    return P
+                    
+def choix_heuristique(B, S, C, P, N):
+    for b in B:
+        if not consistance([b]+S,C):
+            B.remove(b)
+            return neg(b)
+        if not consistance([neg(b)]+S,C):
+            B.remove(b)
+            return b
+
+    for b in B:
+        (x, v, _) = b
+        if (x*v) in P :
+            B.remove(b)
+            return b
+        if -(x*v) in P :
+            B.remove(b)
+            return neg(b)
+
+    L = np.arange(N)
+
+    for c in C:
+        tmp = []
+        for l in c:
+            if l not in S:
+                tmp.append(abs(l))
+            elif -l in S:
+                continue
+            else:
+                tmp = []
+                break
+        for l in tmp:
+            L[l-1] += 1
+
+    select = np.argmax(L)+1
+    for (x, v, w) in B:
+        if (x*v) == select:
+            B.remove((x, v, w))
+            return (x, v, w)
+        if -(x*v) == select:
+            B.remove((x, v, w))
+            return neg((x, v, w))
+
+    return B.pop(0)
+
+def dpll(C, N, choix = choix_heuristique, base = base_defaut, verbose = False):
     """
     C : ensemble des clauses
     N : nombre de litteraux
@@ -48,26 +119,36 @@ def dpll(C, N, choix = choix_defaut, base = base_defaut, verbose = False):
     Implémentation de l'algorithme DPLL sous forme itérative
     avec une pile S contenant les affectations partielles courantes.
     """
+    talkS = Talk(verbose)
+    talkB = Talk(verbose)
     talk = Talk(verbose)
+
     talk("N: {}", N)
     S = [] # pile des affectations partielles courantes
     fin = False
 
     B = base(N)
-    talk("B: {}", B)
-
+    P = build_pure(C)
+    
     while not fin :
-        talk("S: {}", S)
+        if len(S)+len(B) != N:
+            talk("!!!!!!!!!")
+        talk("P [{}]: {}", len(P), P)
+        talkB("B [{}]: {}", len(B), [x*v for x, v, _ in B])
+        talkS("S [{}]: {}\n", len(S), [x*v for x, v, _ in S])
+        
         if consistance(S, C):
             if len(S) == N:
                 fin = True
             else:
-                X = choix(B, len(S))
+                X = choix(B, S, C, P, N)
                 S.append(X)
         else:
             (x, v, w) = S.pop()
             while len(S) > 0 and w == None:
+                B.append((x, 1, -1))
                 (x, v, w) = S.pop()
+
             if w != None:
                 S.append((x, w, None))
             else:
