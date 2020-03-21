@@ -65,6 +65,7 @@ def build_pure(C):
     return P
                     
 def choix_heuristique(B, S, C, P, N):
+    #unique
     for b in B:
         if not consistance([b]+S,C):
             B.remove(b)
@@ -73,17 +74,8 @@ def choix_heuristique(B, S, C, P, N):
             B.remove(b)
             return b
 
-    for b in B:
-        (x, v, _) = b
-        if (x*v) in P :
-            B.remove(b)
-            return b
-        if -(x*v) in P :
-            B.remove(b)
-            return neg(b)
-
+    #heuristique
     L = np.arange(N)
-
     for c in C:
         tmp = []
         for l in c:
@@ -96,7 +88,6 @@ def choix_heuristique(B, S, C, P, N):
                 break
         for l in tmp:
             L[l-1] += 1
-
     select = np.argmax(L)+1
     for (x, v, w) in B:
         if (x*v) == select:
@@ -105,7 +96,6 @@ def choix_heuristique(B, S, C, P, N):
         if -(x*v) == select:
             B.remove((x, v, w))
             return neg((x, v, w))
-
     return B.pop(0)
 
 def dpll(C, N, choix = choix_heuristique, base = base_defaut, verbose = False):
@@ -119,8 +109,6 @@ def dpll(C, N, choix = choix_heuristique, base = base_defaut, verbose = False):
     Implémentation de l'algorithme DPLL sous forme itérative
     avec une pile S contenant les affectations partielles courantes.
     """
-    talkS = Talk(verbose)
-    talkB = Talk(verbose)
     talk = Talk(verbose)
 
     talk("N: {}", N)
@@ -134,8 +122,8 @@ def dpll(C, N, choix = choix_heuristique, base = base_defaut, verbose = False):
         if len(S)+len(B) != N:
             talk("!!!!!!!!!")
         talk("P [{}]: {}", len(P), P)
-        talkB("B [{}]: {}", len(B), [x*v for x, v, _ in B])
-        talkS("S [{}]: {}\n", len(S), [x*v for x, v, _ in S])
+        talk("B [{}]: {}", len(B), [x*v for x, v, _ in B])
+        talk("S [{}]: {}\n", len(S), [x*v for x, v, _ in S])
         
         if consistance(S, C):
             if len(S) == N:
@@ -153,5 +141,4 @@ def dpll(C, N, choix = choix_heuristique, base = base_defaut, verbose = False):
                 S.append((x, w, None))
             else:
                 fin = True
-
     return [x*v for x, v, _ in S]

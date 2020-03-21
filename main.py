@@ -3,7 +3,9 @@ from os.path import join
 
 from dpll import dpll, consistance
 
-from tlbpy import Duration, get_files, cnf_parser
+from tlbpy import Duration, get_files, get_file_ext
+
+from utils import cnf_parser, col_parser, col_to_cnf
 
 import cProfile
 import re
@@ -26,7 +28,8 @@ def main():
 
     if len(sys.argv) < 1 + 1 or len(sys.argv) > 1 + 2:
         print("usage:", sys.argv[0],"<filename(str)> [optionnal : <verbose(bool)>]")
-        print("Liste des fichiers disponibles :", get_files(DATA, ext=["cnf"], basename=True))
+        print("Liste des fichiers disponibles :", get_files(DATA, ext=["cnf"]))
+        print("Liste des fichiers disponibles :", get_files(DATA, ext=["col"]))
     else :
         filename = sys.argv[1]
         verbose = False
@@ -36,17 +39,23 @@ def main():
             except:
                 Exception("usage <verbose> : 0 1")
         
-        data, n, _ = cnf_parser(filename)
-
-        print("Ensemble des clauses : ", data)
+        if get_file_ext(filename) == "col":
+            data, nb_som, _ = col_parser(filename)
+            cnf , n = col_to_cnf(data, nb_som, 2)
+        elif get_file_ext(filename) == "cnf":
+            cnf, n, _ = cnf_parser(filename)
+        else:
+            Exception("only .col or .cnf file are granted")
+        
+        print("Ensemble des clauses : \n", cnf)
+        print("Nombre de littéraux :", n)
+        print(type(cnf[0][0]))
         duration()
-        s = dpll(data, n, verbose=verbose)
+        s = dpll(cnf, n, verbose=verbose)
         duree = duration()
         print("Solution : ", s)
-        print("Solution", "a priori vraie" if verif_solution(s, data, n) else "fausse")
+        print("Solution", "a priori vraie" if verif_solution(s, cnf, n) else "fausse")
         print("Temps de résolution :", duree, "secondes")
-
-        # cProfile.run("dpll(data, n, verbose=verbose)")
 
 if __name__ == '__main__':
     main()
