@@ -1,13 +1,13 @@
 # dpll_sat
  Implémentation d'un solveur SAT avec l'algorithme DPLL
 
- requirements : 
+ requirements :   
  pip install tlbpy==0.0.12
 
- usage :
+ usage :  
  python main.py <filename> <verbose(0|1)>
 
- exemple : 
+ exemple :   
  python main.py "data/test.cnf" 1  
  python main.py "data/test.col" 1  
  python main.py "data/flat20_3_0.col" 0  
