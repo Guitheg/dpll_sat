@@ -8,13 +8,13 @@
 
  usage : 
  ```bash
- python main.py <filename> <verbose(0|1)>
+ python main.py <filename> <verbose(0|1)> [optional : <nombre_couleur>]
  ```
 
  exemple : 
  ```bash
  python main.py "data/test.cnf" 1  
- python main.py "data/test.col" 1  
- python main.py "data/flat20_3_0.col" 0  
+ python main.py "data/test.col" 1 3  
+ python main.py "data/flat20_3_0.col" 0 3  
  python main.py "data/uf20-01.cnf" 0  
  ```

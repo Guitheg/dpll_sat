@@ -12,6 +12,7 @@ import re
 
 MAIN = os.path.abspath(os.path.dirname(__file__))
 DATA = join(MAIN, "data")
+NB_COL_DEFAULT = 3
 
 def verif_solution(S, C, N):
     if len(S) != N:
@@ -26,22 +27,21 @@ def verif_solution(S, C, N):
 def main():
     duration = Duration()
 
-    if len(sys.argv) < 1 + 1 or len(sys.argv) > 1 + 2:
-        print("usage:", sys.argv[0],"<filename(str)> [optionnal : <verbose(bool)>]")
+    if len(sys.argv) < 1 + 2 or len(sys.argv) > 1 + 3:
+        print("usage:", sys.argv[0],"<filename(str)> <verbose(bool)> [optionnal : <nb_col(int)>]")
         print("Liste des fichiers disponibles :", get_files(DATA, ext=["cnf"]))
         print("Liste des fichiers disponibles :", get_files(DATA, ext=["col"]))
     else :
         filename = sys.argv[1]
-        verbose = False
-        if len(sys.argv) == 1 + 2:
-            try:
-                verbose = bool(int(sys.argv[2]))
-            except:
-                Exception("usage <verbose> : 0 1")
+        verbose = bool(int(sys.argv[2]))
         
         if get_file_ext(filename) == "col":
+            if len(sys.argv) != 1 + 3:
+                n_col = NB_COL_DEFAULT
+            else : 
+                n_col = int(sys.argv[3])
             data, nb_som, _ = col_parser(filename)
-            cnf , n = col_to_cnf(data, nb_som, 2)
+            cnf , n = col_to_cnf(data, nb_som, n_col)
         elif get_file_ext(filename) == "cnf":
             cnf, n, _ = cnf_parser(filename)
         else:
@@ -49,7 +49,8 @@ def main():
         
         print("Ensemble des clauses : \n", cnf)
         print("Nombre de littéraux :", n)
-        print(type(cnf[0][0]))
+        if n_col :
+            print("Nombre de couleurs :", n_col)
         duration()
         s = dpll(cnf, n, verbose=verbose)
         duree = duration()
