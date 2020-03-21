@@ -5,7 +5,7 @@
  pip install tlbpy==0.0.12
 
  usage :  
- python main.py <filename> <verbose(0|1)>
+ python main.py  <filename>  <verbose(0|1)>
 
  exemple :   
  python main.py "data/test.cnf" 1  
